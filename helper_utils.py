@@ -3,7 +3,6 @@ import numpy as np
 import chromadb
 import pandas as pd
 from pypdf import PdfReader
-import numpy as np
 
 
 def project_embeddings(embeddings, umap_transform):
