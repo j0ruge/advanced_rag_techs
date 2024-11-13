@@ -34,7 +34,11 @@ from langchain.text_splitter import (
 );
 
 character_splitter = RecursiveCharacterTextSplitter(
-    separators=["\n\n", "\n", ". "," ", ""], chunks_size=1000, chunk_overlap=0
+    separators=["\n\n", "\n", ". ", " ", ""], chunk_size=1000, chunk_overlap=0
 );
 
 character_split_texts = character_splitter.split_text("\n\n".join(pdf_texts));
+
+print(word_wrap(character_split_texts[10]));
+
+print(f"Number of chunks: {len(character_split_texts)}");
