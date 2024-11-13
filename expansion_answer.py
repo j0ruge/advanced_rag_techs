@@ -61,3 +61,28 @@ from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunct
 
 embedding_function = SentenceTransformerEmbeddingFunction();
 print(embedding_function([token_split_texts[10]]));
+
+
+# Chrmomadb client
+
+chroma_client = chromadb.Client();
+
+chroma_collection = chroma_client.create_collection(
+    "microsoft-collection", embedding_function=embedding_function
+);
+
+# extract the embeddings of the token_split_texts
+
+ids = [str(index) for index in range(len(token_split_texts))];
+
+chroma_collection.add(ids=ids, documents=token_split_texts);
+count = chroma_collection.count();
+
+query = "What was the total revenue for the year?"
+
+results = chroma_collection.query(query_texts=[query], n_results=5);
+retrieved_documents = results["documents"][0];
+
+for document in retrieved_documents:
+    print(word_wrap(document));
+    print("\n");
