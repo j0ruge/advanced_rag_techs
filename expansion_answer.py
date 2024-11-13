@@ -27,3 +27,14 @@ pdf_texts = [text for text in pdf_texts if text];
 
 # split the text into smaller chunks
 # to avoid the 4096 token limit
+
+from langchain.text_splitter import (
+    RecursiveCharacterTextSplitter,
+    SentenceTransformersTokenTextSplitter,
+);
+
+character_splitter = RecursiveCharacterTextSplitter(
+    separators=["\n\n", "\n", ". "," ", ""], chunks_size=1000, chunk_overlap=0
+);
+
+character_split_texts = character_splitter.split_text("\n\n".join(pdf_texts));
