@@ -9,8 +9,9 @@ load_dotenv();
 
 # Get the API key from the environment variables
 openai_key = os.getenv("OPENAI_API_KEY");
+client = OpenAI(api_key=openai_key);
 
-print(openai_key);
+# print(openai_key);
 
 reader = PdfReader("data/microsoft-annual-report.pdf");
 pdf_texts = [page.extract_text().strip() for page in reader.pages];
@@ -60,7 +61,7 @@ import chromadb;
 from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction;
 
 embedding_function = SentenceTransformerEmbeddingFunction();
-print(embedding_function([token_split_texts[10]]));
+# print(embedding_function([token_split_texts[10]]));
 
 
 # Chrmomadb client
@@ -81,6 +82,48 @@ count = chroma_collection.count();
 query = "What was the total revenue for the year?"
 
 results = chroma_collection.query(query_texts=[query], n_results=5);
+retrieved_documents = results["documents"][0];
+
+# for document in retrieved_documents:
+#     print(word_wrap(document));
+#     print("\n");
+
+
+# Models
+# gpt-4o-mini
+# gpt-3.5-turbo
+
+
+def augment_query_generated(query, model="gpt-4o-mini"):
+    prompt = """You are a helpful expert financial research assistant. 
+   Provide an example answer to the given question, that might be found in a document like an annual report."""
+    messages = [
+        {
+            "role": "system",
+            "content": prompt,
+        },
+        {   
+            "role": "user",
+            "content": query
+        },
+    ]
+
+    response = client.chat.completions.create(
+        model=model,
+        messages=messages,
+    );
+    content = response.choices[0].message.content;
+    return content;
+
+original_query = "What was the total profit for the year, and how does it compare to the previous year?";
+hypothetical_answer = augment_query_generated(original_query);
+
+joint_query = f"{original_query} {hypothetical_answer}";
+# print(word_wrap(joint_query));
+
+results = chroma_collection.query(
+    query_texts=joint_query, n_results=5, include=["documents", "embeddings"]
+)
 retrieved_documents = results["documents"][0];
 
 for document in retrieved_documents:
