@@ -39,6 +39,25 @@ character_splitter = RecursiveCharacterTextSplitter(
 
 character_split_texts = character_splitter.split_text("\n\n".join(pdf_texts));
 
-print(word_wrap(character_split_texts[10]));
+# print(word_wrap(character_split_texts[10]));
+# print(f"\nTotal chunks: {len(character_split_texts)}");
 
-print(f"Number of chunks: {len(character_split_texts)}");
+token_splitter = SentenceTransformersTokenTextSplitter(
+    chunk_overlap=0, tokens_per_chunk=256
+);
+
+token_split_texts = [];
+
+for text in character_split_texts:
+    token_split_texts += token_splitter.split_text(text);
+
+# print(word_wrap(character_split_texts[10]));
+# print(f"\nTotal chunks: {len(character_split_texts)}");
+
+
+# Embedding the text chunks
+import chromadb;
+from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction;
+
+embedding_function = SentenceTransformerEmbeddingFunction();
+print(embedding_function([token_split_texts[10]]));
